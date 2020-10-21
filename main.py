@@ -26,5 +26,5 @@ if __name__ == "__main__":
     # Debug for further console testing
     p = debug_variable['players']
     p = p[0]
-    phases = debug_variable["phases"]
-    dmg = phases[0]["dmgStats"]
+    phases = debug_variable["phases"][0]
+    dmg = phases["dmgStats"]

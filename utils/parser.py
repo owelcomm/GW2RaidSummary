@@ -4,7 +4,7 @@ import codecs
 import glob, os
 
 
-def parse(logs_folder, players):
+def parse(logs_folder, players, professions):
     """
     Update the players list, using all the html files in the log directory
 
@@ -14,6 +14,8 @@ def parse(logs_folder, players):
         Directory containing the html files
     players : list of Player objects
         List containing all the players to be updated
+    professions : list[Profession]
+        A list of "Profession" objects
 
     Returns
     -------
@@ -25,14 +27,34 @@ def parse(logs_folder, players):
     id_fight = 0  # Current file analysed
     os.chdir(logs_folder)
     for file in glob.glob("*.html"):
-        debug_variable = parse_fight(file, players, id_fight)
+        debug_variable = parse_fight(file, players, id_fight, professions)
         id_fight += 1
         print("file " + str(id_fight) + " in " + str(
             len(glob.glob("*.html"))) + " files")  # Debug print, showing the current file being parsed
     return debug_variable
 
 
-def parse_fight(file, players, id_fight):
+def append_boon(player,boon,boon_list,boon_id):
+    """
+    Update the player's selected boon list, and fill it with 0 if no possible
+
+    Parameters
+    ----------
+    player : Player
+    boon : str
+        selected boon
+    boon_list : list[float]
+        List from the html file containing all boon data from the player
+    boon_id : int
+        position of the selected boon in the boon list
+    """
+    try :
+        getattr(player,boon).append(boon_list[boon_id][0])
+    except:
+        getattr(player, boon).append(0)
+
+
+def parse_fight(file, players, id_fight, professions):
     """
     Update the players using one single fight file
 
@@ -44,6 +66,8 @@ def parse_fight(file, players, id_fight):
         the index of the fight (ids in a directory being "1, 2, 3, ...")
     players : list[Player]
         List containing all the players to be updated
+    professions : list[Profession]
+        A list of "Profession" objects
 
     Returns
     -------
@@ -105,6 +129,14 @@ def parse_fight(file, players, id_fight):
           │         │            │     ├──    ...
           │         │            │     └──  player #n : ...
           │         │            ├── ...
+          │         │            ├── dpsStatsTargets
+          │         │            │     ├──  player #1
+          │         │            │     │      ├── 0 : damage
+          │         │            │     │      ├── 1 : power damage
+          │         │            │     │      └── 2 : condi damate
+          │         │            │     ├──    ...
+          │         │            │     └──  player #n : ...
+          │         │            ├── ...
           │         │            └── playerActiveTimes
           │         ├── boons : ...
           │         ├── ...
@@ -134,13 +166,24 @@ def parse_fight(file, players, id_fight):
         playL.append(i['acc'])
     phases = temp["phases"]
     dmgstats = phases[0]["dmgStats"]
+    boons = phases[0]["boonGenActiveGroupStats"]
+    dmg = phases[0]["dpsStatsTargets"]
     for p in players:
         if p.name in playL:
             p_index = playL.index(p.name)
-            if dmgstats[p_index][20] < 1500:
+            if dmgstats[p_index][20] < 1500 and len(boons[p_index]["data"])==12:
+                for prof in professions:
+                    if play[p_index]['profession'] == prof.name:
+                        p.profession = prof
+
                 p.dist.append(dmgstats[p_index][20])
                 p.fights.append(id_fight)
-            p.groupe = play[p_index]['group']
-            p.classe = play[p_index]['profession']
+                p.groupe = play[p_index]['group']
+                p.dmg.append(dmg[p_index][0][0])
+                append_boon(p, "power", boons[p_index]["data"], 0)
+                append_boon(p, "stab", boons[p_index]["data"], 8)
+                append_boon(p, "protec", boons[p_index]["data"], 4)
+                append_boon(p, "resistance", boons[p_index]["data"], 11)
+
 
     return temp

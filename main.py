@@ -1,5 +1,5 @@
 from utils import parser
-from utils import player
+from utils import description
 from utils import plotter
 
 if __name__ == "__main__":
@@ -15,13 +15,16 @@ if __name__ == "__main__":
     # Instantiating the player objects in a player list
     players = []
     for i in players_names:
-        players.append(player.Player(i))
+        players.append(description.Player(i))
+
+    # Instantiating the different profession objects
+    professions = description.init_professions()
 
     # Reading and parsing the logs
-    debug_variable = parser.parse(logs_folder, players)
+    debug_variable = parser.parse(logs_folder, players, professions)
 
     # Display of the graphs
-    plotter.harry_plotter(players, "dist")
+    plotter.plot_all(players)
 
     # Debug for further console testing
     p = debug_variable['players']

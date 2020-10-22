@@ -23,7 +23,7 @@ def parse(logs_folder, players, professions):
         A debug variable containing the fight data of the last html file
 
     """
-
+    root = os.getcwd()
     id_fight = 0  # Current file analysed
     os.chdir(logs_folder)
     print("\n\nPARSING...\n")
@@ -32,6 +32,8 @@ def parse(logs_folder, players, professions):
         id_fight += 1
         print("file " + str(id_fight) + " in " + str(
             len(glob.glob("*.html"))) + " files")  # Debug print, showing the current file being parsed
+
+    os.chdir(root)
     return debug_variable
 
 
@@ -112,6 +114,30 @@ def parse_fight(file, players, id_fight, professions):
           │         │            │     ├──  player #2 : ...
           │         │            │     ├──    ...
           │         │            │     └──  player #n : ...
+          │         │            ├──defStats
+          │         │            │     ├──  player #1
+          │         │            │     │      ├── 0 : damage taken
+          │         │            │     │      ├── 1 : barrier
+          │         │            │     │      ├── 2 : attacks blocked
+          │         │            │     │      ├── 3 : invu
+          │         │            │     │      ├── 4 : interrupted
+          │         │            │     │      ├── 5 : evades
+          │         │            │     │      ├── 6 : dodge
+          │         │            │     │      ├── 7 : ...
+          │         │            │     ├──    ...
+          │         │            │     └──  player #n : ...
+          │         │            ├──supportStats
+          │         │            │     ├──  player #1
+          │         │            │     │      ├── 0 : cleanse
+          │         │            │     │      ├── 1 : ...
+          │         │            │     │      ├── 2 : ...
+          │         │            │     │      ├── 3 : ...
+          │         │            │     │      ├── 4 : strips
+          │         │            │     │      ├── 5 : ...
+          │         │            │     │      ├── 6 : resurrect
+          │         │            │     │      ├── 7 : ...
+          │         │            │     ├──    ...
+          │         │            │     └──  player #n : ...
           │         │            ├── ...
           │         │            ├── boonGenGroupStats
           │         │            │     ├──  player #1
@@ -134,7 +160,7 @@ def parse_fight(file, players, id_fight, professions):
           │         │            │     ├──  player #1
           │         │            │     │      ├── 0 : damage
           │         │            │     │      ├── 1 : power damage
-          │         │            │     │      └── 2 : condi damate
+          │         │            │     │      └── 2 : condi damage
           │         │            │     ├──    ...
           │         │            │     └──  player #n : ...
           │         │            ├── ...
@@ -167,6 +193,8 @@ def parse_fight(file, players, id_fight, professions):
         playL.append(i['acc'])
     phases = temp["phases"]
     dmgstats = phases[0]["dmgStats"]
+    defstats = phases[0]["defStats"]
+    supstats = phases[0]["supportStats"]
     boons = phases[0]["boonGenActiveGroupStats"]
     dmg = phases[0]["dpsStatsTargets"]
     for p in players:
@@ -177,7 +205,11 @@ def parse_fight(file, players, id_fight, professions):
                     if play[p_index]['profession'] == prof.name:
                         p.profession = prof
 
-                p.dist.append(dmgstats[p_index][20])
+                p.distance.append(dmgstats[p_index][20])
+                p.evades.append(defstats[p_index][5])
+                p.dodges.append(defstats[p_index][6])
+                p.cleanses.append(supstats[p_index][0])
+                p.strips.append(supstats[p_index][4])
                 p.fights.append(id_fight)
                 p.groupe = play[p_index]['group']
                 p.dmg.append(dmg[p_index][0][0])

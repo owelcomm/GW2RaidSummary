@@ -181,6 +181,8 @@ def parse_fight(file, players, id_fight, professions):
                 p.fights.append(id_fight)
                 p.groupe = play[p_index]['group']
                 p.dmg.append(dmg[p_index][0][0])
+                p.commander.append(play[p_index]['isCommander'])
+
                 getattr(p, "power").append(boons[p_index]["data"][0][0])
                 getattr(p, "stab").append(boons[p_index]["data"][8][0])
                 getattr(p, "protect").append(boons[p_index]["data"][4][0])

@@ -10,6 +10,7 @@ class Player:
         self.power = []
         self.protect = []
         self.resistance = []
+        self.commander = []
 
 
 class Profession:

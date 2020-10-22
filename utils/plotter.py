@@ -3,10 +3,13 @@ from utils import statutils
 import numpy as np
 from scipy.interpolate import make_interp_spline
 
+
 def plot_all(players):
+    print("\n\nDISPLAYING PLOTS...\n")
     plot_focus(players, "dmg", ["dps"])
-    plot_focus(players, "stab", ["FB"])
-    plot_focus(players, "protec", ["FB"])
+    plot_focus(players, "stab", ["stab"])
+    plot_focus(players, "protect", ["protect"])
+    plot_focus(players, "resistance", ["resist"])
 
 
 def plot_focus(players, data, keywords):
@@ -24,7 +27,7 @@ def plot_focus(players, data, keywords):
     """
 
     legends = []
-    pl.figure()
+    #pl.figure()
     for p in players:
 
         # Check if the player is in the fight and checks all keywords
@@ -36,17 +39,15 @@ def plot_focus(players, data, keywords):
                         flag_kw = 1
             except:
                 print("Unexpected profession: ", p.name)
-
             if flag_kw == 0:
-                pl.plot(p.fights, getattr(p, data))
+                # pl.plot(p.fights, getattr(p, data))
                 legends.append(p.name)
 
-    pl.title(data.upper())
-    pl.xlabel("#fights")
-    pl.ylabel(data + " for each fight")
-    pl.legend(legends)
+    # pl.title(data.upper())
+    # pl.xlabel("#fights")
+    # pl.ylabel(data + " for each fight")
+    # pl.legend(legends)
 
-    legends = []
     pl.figure()
     for p in players:
         # Check if the player is in the fight and checks all keywords
@@ -59,22 +60,20 @@ def plot_focus(players, data, keywords):
             if flag_kw == 0:
                 try:
                     x, y = statutils.polyreg(p.fights, getattr(p, data))
-                    x=x.transpose()[0]
+                    x = x.transpose()[0]
                     try:
                         xnew = np.linspace(x.min(), x.max(), 200)
                         spl = make_interp_spline(x, y, k=3)
                         y_smooth = spl(xnew)
-                        pl.plot(xnew, y_smooth)
-                        legends.append(p.name)
+                        pl.plot(xnew, y_smooth,label=p.name)
                     except:
-                        print(p.name," : not enough fights")
+                        print("error for player ", p.name, " : not enough fights")
                 except:
-                   print("Unexpected error : ", data, p.name, p.fights, getattr(p, data))
-
+                    print("Unexpected error : ", data, p.name, p.fights, getattr(p, data))
 
     pl.title(data.upper())
     pl.xlabel("#fights")
     pl.ylabel("smoothed curve of " + data)
-    pl.legend(legends)
+    pl.legend()
 
     pl.show()

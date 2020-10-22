@@ -26,6 +26,7 @@ def parse(logs_folder, players, professions):
 
     id_fight = 0  # Current file analysed
     os.chdir(logs_folder)
+    print("\n\nPARSING...\n")
     for file in glob.glob("*.html"):
         debug_variable = parse_fight(file, players, id_fight, professions)
         id_fight += 1
@@ -180,10 +181,12 @@ def parse_fight(file, players, id_fight, professions):
                 p.fights.append(id_fight)
                 p.groupe = play[p_index]['group']
                 p.dmg.append(dmg[p_index][0][0])
-                append_boon(p, "power", boons[p_index]["data"], 0)
-                append_boon(p, "stab", boons[p_index]["data"], 8)
-                append_boon(p, "protec", boons[p_index]["data"], 4)
-                append_boon(p, "resistance", boons[p_index]["data"], 11)
+                getattr(p, "power").append(boons[p_index]["data"][0][0])
+                getattr(p, "stab").append(boons[p_index]["data"][8][0])
+                getattr(p, "protect").append(boons[p_index]["data"][4][0])
+                getattr(p, "resistance").append(boons[p_index]["data"][11][0])
+    if len(boons[p_index]["data"])!=12:
+        print("fight #",id_fight," excluded, not enough boon generated")
 
 
     return temp

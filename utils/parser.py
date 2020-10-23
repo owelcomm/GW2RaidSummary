@@ -190,7 +190,7 @@ def parse_fight(file, players, id_fight, professions):
     txt = txt.replace("true", "True")
     txt = txt.replace("false", "False")
     txt = txt[txt.find("{"):txt.find(";")]
-    temp = ast.literal_eval(txt)
+    temp = ast.literal_eval(txt) #Transform the dictionnory in the html file into an actual variable
     play = temp["players"]
     playL = []
     for i in play:
@@ -229,7 +229,6 @@ def parse_fight(file, players, id_fight, professions):
                 getattr(p, "stab").append(boons[p_index]["data"][8][0])
                 getattr(p, "protect").append(boons[p_index]["data"][4][0])
                 getattr(p, "resistance").append(boons[p_index]["data"][11][0])
-
 
                 try:
                     getattr(p, "stab_coverage").append(boonscoverage[p_index]["data"][8][1])

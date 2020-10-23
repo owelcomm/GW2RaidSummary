@@ -7,8 +7,10 @@ class Player:
         self.groupe = groupe
         self.profession = profession
         self.stab = []
+        self.stab_coverage = []
         self.power = []
         self.protect = []
+        self.protect_coverage = []
         self.resistance = []
         self.commander = []
         self.dodges = []
@@ -31,6 +33,11 @@ class Profession:
         self.stab = stab
         self.resist = resist
         self.protect = protect
+
+
+class Fight:
+    def __init__(self, start):
+        self.start = start
 
 
 def init_professions():

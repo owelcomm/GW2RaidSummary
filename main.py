@@ -21,10 +21,10 @@ if __name__ == "__main__":
     professions = description.init_professions()
 
     # Reading and parsing the logs
-    debug_variable = parser.parse(logs_folder, players, professions)
+    fights, debug_variable = parser.parse(logs_folder, players, professions)
 
     # Display of the graphs
-    plotter.plot_all(players)
+    plotter.plot_all(players, fights)
 
     # Debug for further console testing
     p = debug_variable['players']

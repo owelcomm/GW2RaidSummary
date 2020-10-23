@@ -2,6 +2,7 @@ import ast
 from bs4 import BeautifulSoup
 import codecs
 import glob, os
+from utils import description
 
 
 def parse(logs_folder, players, professions):
@@ -19,42 +20,26 @@ def parse(logs_folder, players, professions):
 
     Returns
     -------
+    fights : list[Fight]
+        List containing all the fights meta data
     dict
         A debug variable containing the fight data of the last html file
 
     """
     root = os.getcwd()
     id_fight = 0  # Current file analysed
+    fights = []
     os.chdir(logs_folder)
     print("\n\nPARSING...\n")
     for file in glob.glob("*.html"):
-        debug_variable = parse_fight(file, players, id_fight, professions)
+        fight, debug_variable = parse_fight(file, players, id_fight, professions)
+        fights.append(fight)
         id_fight += 1
         print("file " + str(id_fight) + " in " + str(
             len(glob.glob("*.html"))) + " files")  # Debug print, showing the current file being parsed
 
     os.chdir(root)
-    return debug_variable
-
-
-def append_boon(player,boon,boon_list,boon_id):
-    """
-    Update the player's selected boon list, and fill it with 0 if no possible
-
-    Parameters
-    ----------
-    player : Player
-    boon : str
-        selected boon
-    boon_list : list[float]
-        List from the html file containing all boon data from the player
-    boon_id : int
-        position of the selected boon in the boon list
-    """
-    try :
-        getattr(player,boon).append(boon_list[boon_id][0])
-    except:
-        getattr(player, boon).append(0)
+    return fights, debug_variable
 
 
 def parse_fight(file, players, id_fight, professions):
@@ -74,6 +59,8 @@ def parse_fight(file, players, id_fight, professions):
 
     Returns
     -------
+    fight : Fight
+        fight object containing the fight meta data
     temp
         A debug variable containing the fight data
 
@@ -139,7 +126,23 @@ def parse_fight(file, players, id_fight, professions):
           │         │            │     ├──    ...
           │         │            │     └──  player #n : ...
           │         │            ├── ...
-          │         │            ├── boonGenGroupStats
+          │         │            ├── boonStats (coverage)
+          │         │            │     ├──  player #1
+          │         │            │     │      ├── 0 : power
+          │         │            │     │      ├── 1 : fury
+          │         │            │     │      ├── 2 : quickness
+          │         │            │     │      ├── 3 : alacrity
+          │         │            │     │      ├── 4 : protection
+          │         │            │     │      ├── 5 : regen
+          │         │            │     │      ├── 6 : vigor
+          │         │            │     │      ├── 7 : aegis
+          │         │            │     │      ├── 8 : stability
+          │         │            │     │      ├── 9 : swiftness
+          │         │            │     │      ├── 10 : retaliation
+          │         │            │     │      └── 11 : resistance
+          │         │            │     ├──    ...
+          │         │            │     └──  player #n : ...
+          │         │            ├── boonGenGroupStats (generation)
           │         │            │     ├──  player #1
           │         │            │     │      ├── 0 : power
           │         │            │     │      ├── 1 : fury
@@ -166,6 +169,7 @@ def parse_fight(file, players, id_fight, professions):
           │         │            ├── ...
           │         │            └── playerActiveTimes
           │         ├── boons : ...
+          │         ├── encounterStart : str
           │         ├── ...
           │         └── uploadLinks : ...
           ├── 16 : ...
@@ -192,15 +196,21 @@ def parse_fight(file, players, id_fight, professions):
     for i in play:
         playL.append(i['acc'])
     phases = temp["phases"]
+
+    start = temp['encounterStart']
+    start = start[start.find(" ") + 1: start.find(" +")]
+    fight = description.Fight(start)
+
     dmgstats = phases[0]["dmgStats"]
     defstats = phases[0]["defStats"]
     supstats = phases[0]["supportStats"]
     boons = phases[0]["boonGenActiveGroupStats"]
+    boonscoverage = phases[0]["boonStats"]
     dmg = phases[0]["dpsStatsTargets"]
     for p in players:
         if p.name in playL:
             p_index = playL.index(p.name)
-            if dmgstats[p_index][20] < 1500 and len(boons[p_index]["data"])==12:
+            if dmgstats[p_index][20] < 1500 and len(boons[p_index]["data"]) == 12:
                 for prof in professions:
                     if play[p_index]['profession'] == prof.name:
                         p.profession = prof
@@ -219,8 +229,17 @@ def parse_fight(file, players, id_fight, professions):
                 getattr(p, "stab").append(boons[p_index]["data"][8][0])
                 getattr(p, "protect").append(boons[p_index]["data"][4][0])
                 getattr(p, "resistance").append(boons[p_index]["data"][11][0])
-    if len(boons[p_index]["data"])!=12:
-        print("fight #",id_fight," excluded, not enough boon generated")
 
 
-    return temp
+                try:
+                    getattr(p, "stab_coverage").append(boonscoverage[p_index]["data"][8][1])
+                except:
+                    getattr(p, "stab_coverage").append(0)
+                try:
+                    getattr(p, "protect_coverage").append(boonscoverage[p_index]["data"][4][0])
+                except:
+                    getattr(p, "protect_coverage").append(0)
+    if len(boons[p_index]["data"]) != 12:
+        print("fight #", id_fight, " excluded, not enough boon generated")
+
+    return fight, temp

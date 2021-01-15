@@ -25,7 +25,7 @@ def polyreg(x, y):
     y = np.array(y)
     x = x[:, np.newaxis]  # We want a column array, not a line array
     polynomial_features = PolynomialFeatures(
-        degree=4)  # feel free to increase de degree for a more accurate but less smooth curve
+        degree=5)  # feel free to increase de degree for a more accurate but less smooth curve
     x_poly = polynomial_features.fit_transform(x)
     model = LinearRegression()
     model.fit(x_poly, y)

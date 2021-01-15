@@ -2,6 +2,8 @@ import pylab as pl
 from utils import statutils
 import numpy as np
 from scipy.interpolate import make_interp_spline
+import matplotlib
+
 
 
 def findSwapCom(name, players):
@@ -71,6 +73,7 @@ def plot_all(players, fights):
 
 
 def plot_focus(players, data, fights, keywords=[], separators=[], title_label=""):
+
     """
     Display a plot of the selected data for each fight, and its polynomial regression
 
@@ -89,7 +92,7 @@ def plot_focus(players, data, fights, keywords=[], separators=[], title_label=""
     title_label : str
         title of the figure, data by default
     """
-
+    #matplotlib.use('Agg')
     if title_label != "":
         figure_name = title_label
     else:
@@ -161,4 +164,4 @@ def plot_focus(players, data, fights, keywords=[], separators=[], title_label=""
     else:
         pl.title(data.upper())
         pl.savefig("plots/" + data.upper() + ".png", bbox_inches='tight', dpi=100)
-    pl.show()
+    #pl.show()

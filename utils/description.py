@@ -55,6 +55,7 @@ def init_professions():
     professions.append(Profession("Dragonhunter", [True, False, False], [False, True], [False, False, False]))
     professions.append(Profession("Guardian", [True, False, False], [True, False], [False, False, False]))
     professions.append(Profession("Spellbreaker", [False, True, True], [True, False], [False, False, True]))
+    professions.append(Profession("Berserker", [True, False, False], [True, False], [False, False, False]))
     professions.append(Profession("Herald", [True, False, False], [False, True], [False, False, False]))
     professions.append(Profession("Renegade", [True, False, False], [True, False], [False, False, False]))
     professions.append(Profession("Scourge", [True, False, True], [False, True], [False, False, False]))

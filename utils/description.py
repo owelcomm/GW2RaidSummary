@@ -17,6 +17,28 @@ class Player:
         self.evades = []
         self.strips = []
         self.cleanses = []
+        self.fights_data = []
+
+    def add_fight_data(self, duration_ms, dmg, strip):
+        self.fights_data.append(PlayerFightData(duration_ms // 1000, dmg, strip))
+
+    def dps(self):
+        if len(self.fights_data) == 0:
+            return "0"
+        dps = 0
+        for fight_data in self.fights_data:
+            dps += fight_data.dps()
+
+        return "{:.2f}".format(dps / len(self.fights_data))
+
+    def strip_per_sec(self):
+        if len(self.fights_data) == 0:
+            return "0"
+        sps = 0
+        for fight_data in self.fights_data:
+            sps += fight_data.strip_per_sec()
+
+        return "{:.2f}".format(sps / len(self.fights_data))
 
 
 class Profession:
@@ -33,6 +55,24 @@ class Profession:
         self.stab = stab
         self.resist = resist
         self.protect = protect
+
+
+class PlayerFightData:
+    def __init__(self, fight_time, dmg, strip):
+        self.fight_time = fight_time
+        self.dmg = dmg
+        self.strip = strip
+
+    def _compute_stat_per_sec(self, func):
+        if self.fight_time == 0:
+            return 0
+        return func(self) / self.fight_time
+
+    def dps(self):
+        return self._compute_stat_per_sec(lambda a: a.dmg)
+
+    def strip_per_sec(self):
+        return self._compute_stat_per_sec(lambda a: a.strip)
 
 
 class Fight:

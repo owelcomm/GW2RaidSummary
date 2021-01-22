@@ -19,8 +19,8 @@ class Player:
         self.cleanses = []
         self.fights_data = []
 
-    def add_fight_data(self, duration_ms, dmg, strip):
-        self.fights_data.append(PlayerFightData(duration_ms // 1000, dmg, strip))
+    def add_fight_data(self, duration_ms, dmg, strip, clean):
+        self.fights_data.append(PlayerFightData(duration_ms // 1000, dmg, strip, clean))
 
     def dps(self):
         if len(self.fights_data) == 0:
@@ -40,6 +40,15 @@ class Player:
 
         return "{:.2f}".format(sps / len(self.fights_data))
 
+    def clean_per_sec(self):
+        if len(self.fights_data) == 0:
+            return "0"
+        cps = 0
+        for fight_data in self.fights_data:
+            cps += fight_data.clean_per_sec()
+
+        return "{:.2f}".format(cps / len(self.fights_data))
+
 
 class Profession:
     def __init__(self, name, fightStats, position, boonStats):
@@ -58,10 +67,11 @@ class Profession:
 
 
 class PlayerFightData:
-    def __init__(self, fight_time, dmg, strip):
+    def __init__(self, fight_time, dmg, strip, clean):
         self.fight_time = fight_time
         self.dmg = dmg
         self.strip = strip
+        self.clean = clean
 
     def _compute_stat_per_sec(self, func):
         if self.fight_time == 0:
@@ -73,6 +83,9 @@ class PlayerFightData:
 
     def strip_per_sec(self):
         return self._compute_stat_per_sec(lambda a: a.strip)
+
+    def clean_per_sec(self):
+        return self._compute_stat_per_sec(lambda a: a.clean)
 
 
 class Fight:

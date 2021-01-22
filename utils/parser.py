@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import ast
 from bs4 import BeautifulSoup
 import codecs
@@ -207,37 +209,39 @@ def parse_fight(file, players, id_fight, professions):
     boons = phases[0]["boonGenActiveGroupStats"]
     boonscoverage = phases[0]["boonStats"]
     dmg = phases[0]["dpsStatsTargets"]
-    for p in players:
-        if p.name in playL:
-            p_index = playL.index(p.name)
+
+    for player in players:
+        if player.name in playL:
+            p_index = playL.index(player.name)
             if dmgstats[p_index][20] < 1500 and len(boons[p_index]["data"]) == 12:
                 for prof in professions:
                     if play[p_index]['profession'] == prof.name:
-                        p.profession = prof
+                        player.profession = prof
 
-                p.distance.append(dmgstats[p_index][20])
-                p.evades.append(defstats[p_index][5])
-                p.dodges.append(defstats[p_index][6])
-                p.cleanses.append(supstats[p_index][0])
-                p.strips.append(supstats[p_index][4])
-                p.fights.append(id_fight)
-                p.groupe = play[p_index]['group']
-                p.dmg.append(dmg[p_index][0][0])
-                p.commander.append(play[p_index]['isCommander'])
+                player.distance.append(dmgstats[p_index][20])
+                player.evades.append(defstats[p_index][5])
+                player.dodges.append(defstats[p_index][6])
+                player.cleanses.append(supstats[p_index][0])
+                player.strips.append(supstats[p_index][4])
+                player.fights.append(id_fight)
+                player.groupe = play[p_index]['group']
+                player.dmg.append(dmg[p_index][0][0])
+                player.commander.append(play[p_index]['isCommander'])
+                player.add_fight_data(phases[0]['duration'], dmg[p_index][0][0], supstats[p_index][4])
 
-                getattr(p, "power").append(boons[p_index]["data"][0][0])
-                getattr(p, "stab").append(boons[p_index]["data"][8][0])
-                getattr(p, "protect").append(boons[p_index]["data"][4][0])
-                getattr(p, "resistance").append(boons[p_index]["data"][11][0])
+                getattr(player, "power").append(boons[p_index]["data"][0][0])
+                getattr(player, "stab").append(boons[p_index]["data"][8][0])
+                getattr(player, "protect").append(boons[p_index]["data"][4][0])
+                getattr(player, "resistance").append(boons[p_index]["data"][11][0])
 
                 try:
-                    getattr(p, "stab_coverage").append(boonscoverage[p_index]["data"][8][1])
+                    getattr(player, "stab_coverage").append(boonscoverage[p_index]["data"][8][1])
                 except:
-                    getattr(p, "stab_coverage").append(0)
+                    getattr(player, "stab_coverage").append(0)
                 try:
-                    getattr(p, "protect_coverage").append(boonscoverage[p_index]["data"][4][0])
+                    getattr(player, "protect_coverage").append(boonscoverage[p_index]["data"][4][0])
                 except:
-                    getattr(p, "protect_coverage").append(0)
+                    getattr(player, "protect_coverage").append(0)
     if len(boons[p_index]["data"]) != 12:
         print("fight #", id_fight, " excluded, not enough boon generated")
 

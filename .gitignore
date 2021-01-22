@@ -1,4 +1,8 @@
 logs/*
+!logs/.keep
 .idea/
 utils/__pycache__/
 backuplogs/
+
+__pycache__/*
+*.pyc

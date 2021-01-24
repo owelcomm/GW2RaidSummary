@@ -72,6 +72,7 @@ def plot_all(players, fights):
                title_label="distance from the lead for distance professions")
     print_txt_report(players, 'dmg', lambda player: player.dps())
     print_txt_report(players, 'strip', lambda player: player.strip_per_sec())
+    print_txt_report(players, 'clean', lambda player: player.clean_per_sec())
 
 
 def print_txt_report(players, title, stat):

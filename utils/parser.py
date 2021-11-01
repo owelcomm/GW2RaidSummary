@@ -213,7 +213,7 @@ def parse_fight(file, players, id_fight, professions):
     for player in players:
         if player.name in playL:
             p_index = playL.index(player.name)
-            if dmgstats[p_index][20] < 15000 and len(boons[p_index]["data"]) == 12:
+            if dmgstats[p_index][20] < 1500 and len(boons[p_index]["data"]) == 12:
                 for prof in professions:
                     if play[p_index]['profession'] == prof.name:
                         player.profession = prof

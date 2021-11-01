@@ -116,7 +116,7 @@ def plot_focus(players, data, fights, keywords=[], separators=[], title_label=""
     colormap = a = pl.cm.tab20  # Choice of the colormap
     colormap = colormap(list(range(len(players))))  # Setup of the colormap
 
-    rawPlots = False
+    rawPlots = True
     color = 0
     for p in players:
 
@@ -135,29 +135,30 @@ def plot_focus(players, data, fights, keywords=[], separators=[], title_label=""
                 if rawPlots == True:  # Plot without regression
                     pl.figure(figure_name + " raw")
                     pl.plot(p.fights, getattr(p, data), color=colormap[color], label=p.name)
-
-                try:
-                    pl.figure(figure_name + " regression")
-                    x, y = statutils.polyreg(p.fights, getattr(p, data))  # Regression
-                    x = x.transpose()[0]
+                else:
                     try:
-                        # Smooth the curve
-                        xnew = np.linspace(x.min(), x.max(), 200)
-                        spl = make_interp_spline(x, y, k=3)
-                        y_smooth = spl(xnew)
-                        pl.plot(xnew, y_smooth, label=p.name, color=colormap[color])
+                        pl.figure(figure_name + " regression")
+                        x, y = statutils.polyreg(p.fights, getattr(p, data))  # Regression
+                        x = x.transpose()[0]
+                        try:
+                            # Smooth the curve
+                            xnew = np.linspace(x.min(), x.max(), 200)
+                            spl = make_interp_spline(x, y, k=3)
+                            y_smooth = spl(xnew)
+                            pl.plot(xnew, y_smooth, label=p.name, color=colormap[color])
+                        except:
+                            print("error for player ", p.name, " : not enough fights")
                     except:
-                        print("error for player ", p.name, " : not enough fights")
-                except:
-                    print("Unexpected error : ", data, p.name, p.fights, getattr(p, data))
+                        print("Unexpected error : ", data, p.name, p.fights, getattr(p, data))
                 color += 1
 
-    pl.figure(figure_name + " regression")
-    # TITLE
-    if title_label != "":
-        pl.title(title_label)
-    else:
-        pl.title(data.upper())
+    if rawPlots == False :
+        pl.figure(figure_name + " regression")
+        # TITLE
+        if title_label != "":
+            pl.title(title_label)
+        else:
+            pl.title(data.upper())
 
     # AXIS/LEGEND
     pl.xticks(xaxis, start_fights, rotation=70)
